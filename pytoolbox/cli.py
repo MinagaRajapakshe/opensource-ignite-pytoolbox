@@ -1,4 +1,5 @@
 import importlib
+import json
 import pkgutil
 
 import typer
@@ -35,8 +36,18 @@ _register_commands()
 
 
 @app.command(name="list")
-def list_commands():
+def list_commands(
+    is_json: bool = typer.Option(False, "--json", help="Print the command list as a JSON array"),
+):
     """List all available commands."""
+
+    if is_json:
+        json_data = []
+        for module in _loaded_commands:
+            json_data.append({"name": module.NAME, "help": getattr(module, "HELP", "")})
+        print(json.dumps(json_data, indent=2))
+        return
+
     table = Table(title="pytoolbox commands")
     table.add_column("Command", style="cyan", no_wrap=True)
     table.add_column("Description", style="white")
