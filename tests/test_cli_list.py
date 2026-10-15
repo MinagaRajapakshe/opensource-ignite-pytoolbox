@@ -1,3 +1,4 @@
+import json
 import pkgutil
 
 import pytest
@@ -27,3 +28,16 @@ def test_list_is_alphabetically_sorted(monkeypatch):
 
     names_in_order = [module.NAME for module in cli._discover_commands()]
     assert names_in_order == sorted(names_in_order)
+
+
+def test_list_json_output():
+
+    result = runner.invoke(app, ["list", "--json"])
+
+    assert result.exit_code == 0
+
+    parsed_data = json.loads(result.stdout)
+
+    assert isinstance(parsed_data, list)
+    assert len(parsed_data) > 0
+    assert "name" in parsed_data[0]
